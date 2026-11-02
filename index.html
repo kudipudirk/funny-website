@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikkada emi ledu 🐒</title>
+<meta name="description" content="Ikkada emi ledu. Seriously. Okay, maybe a little.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐒</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffd93b;--ink:#1c1300;--red:#e63946;--white:#fffdf2;--head:"Bangers",Impact,sans-serif;--body:"Baloo 2",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#2a1f00;--ink:#fff3c4;--red:#ff6b76;--white:#3a2c00}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 1.15rem/1.5 var(--body);overflow-x:hidden;text-align:center}
+:focus-visible{outline:4px solid var(--red);outline-offset:3px}
+main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.25rem;gap:1.25rem}
+.screen{display:none;width:100%;max-width:34rem;flex-direction:column;align-items:center;gap:1rem}
+.screen.on{display:flex}
+h1{font:400 clamp(2.4rem,9vw,4.2rem)/1 var(--head);letter-spacing:.02em;margin:0}
+h1 em{font-style:normal;color:var(--red)}
+p{margin:0}
+
+/* Fake loading */
+.bar{width:100%;height:1.6rem;border:4px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--white)}
+.bar i{display:block;height:100%;width:0;background:var(--red)}
+
+/* Monkey */
+.monkey{width:min(15rem,70vw);height:min(15rem,70vw);display:grid;place-items:center;border-radius:50%;background:var(--white);border:5px solid var(--ink);font-size:8rem;position:relative;overflow:hidden}
+.monkey img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.err{font:400 1.4rem var(--head);background:var(--ink);color:var(--bg);padding:.2rem .9rem;border-radius:.4rem;letter-spacing:.04em}
+
+/* Buttons */
+.actions{position:relative;width:100%;height:9rem}
+button,.btn{font:700 1.1rem var(--body);padding:.7rem 1.4rem;border:4px solid var(--ink);border-radius:999px;background:var(--white);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;box-shadow:4px 4px 0 var(--ink)}
+button:active,.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.go{background:var(--red);color:#fff}
+#run{position:absolute;left:50%;top:0;transform:translateX(-50%);transition:left .2s,top .2s}
+#more{position:absolute;left:50%;top:4.5rem;transform:translateX(-50%)}
+.reveal .btn{margin-top:.5rem}
+.small{font-size:.95rem;opacity:.8}
+.fall{position:fixed;top:-2rem;font-size:2rem;pointer-events:none;animation:fall 3s linear forwards;z-index:9}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:no-preference){
+  .monkey span,.monkey img{animation:wobble 1.2s ease-in-out infinite}
+  @keyframes wobble{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- SCREEN 1: fake loading -->
+  <section class="screen on" id="s1">
+    <h1>Loading my life story…</h1>
+    <div class="bar" role="progressbar" aria-label="Loading"><i id="fill"></i></div>
+    <p id="pct">0%</p>
+  </section>
+
+  <!-- SCREEN 2: the joke. Change the words here. -->
+  <section class="screen" id="s2">
+    <div class="err">ERROR 404</div>
+    <h1>Ikkada <em>emi ledu</em> 🐒</h1>
+    <div class="monkey" aria-label="A confused monkey">
+      <span>🐒</span>
+      <!-- Put your funny monkey photo here as monkey.jpg (same folder). If missing, the emoji stays. -->
+      <img src="monkey.jpg" alt="Funny monkey" onerror="this.remove()">
+    </div>
+    <p>Phani emledha? Inka ikkade enduku unnav? 😂</p>
+    <div class="actions">
+      <button class="go" id="run" type="button">Sare, nenu velthunna</button>
+      <button id="more" type="button">Inka emaina undha?</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: the reveal -->
+  <section class="screen reveal" id="s3">
+    <h1>Okay okay, <em>mosam chesanu</em> 😎</h1>
+    <p>Real story ikkada undi. Memories, friends, and a few quotes. Chadivi, nachite share cheyyi.</p>
+    <a class="btn go" href="story.html">Naa life story chudu 📖</a>
+    <p class="small" id="note"></p>
+  </section>
+
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); };
+
+/* Screen 1: bar races to 99% and then "fails" */
+let p = 0;
+const timer = setInterval(() => {
+  p += p < 70 ? 7 : p < 95 ? 2 : 1;
+  if (p >= 99) { p = 99; clearInterval(timer); setTimeout(() => show('s2'), 900); }
+  $('fill').style.width = p + '%'; $('pct').textContent = p + '%';
+}, 90);
+
+/* Screen 2: the "go away" button dodges 5 times, then gives up */
+const run = $('run'); let dodges = 0;
+const lines = ['Ledu ra, velladam kudaradu 😂','Ayyo, ala povaddu!','Pattukoleva?','Inka okka sari try cheyyi','Sare sare, ippudu pattuko'];
+function dodge(e){
+  if (dodges >= 5) return;
+  e.preventDefault();
+  const box = run.parentElement.getBoundingClientRect();
+  const x = 15 + Math.random() * 70;
+  run.style.left = x + '%'; run.style.top = (Math.random() * 1.4) + 'rem';
+  run.textContent = lines[dodges]; dodges++;
+}
+run.addEventListener('pointerenter', dodge);
+run.addEventListener('touchstart', dodge, {passive:false});
+run.addEventListener('click', () => { if (dodges >= 5) { run.textContent = 'Sare, nuvve gelichav 🏆'; setTimeout(reveal, 800); } });
+$('more').addEventListener('click', reveal);
+
+/* Screen 3 + falling bananas */
+function reveal(){
+  show('s3');
+  $('note').textContent = 'Psst… monkey ki cheppaku 🤫';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for (let i = 0; i < 24; i++) {
+    const b = document.createElement('div');
+    b.className = 'fall'; b.textContent = i % 3 ? '🍌' : '🐒';
+    b.style.left = Math.random() * 95 + 'vw'; b.style.animationDelay = Math.random() * 1.2 + 's';
+    document.body.appendChild(b); setTimeout(() => b.remove(), 4500);
+  }
+}
+</script>
+</body>
+</html>
