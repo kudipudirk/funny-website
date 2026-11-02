@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pattuko ra! 🐒</title>
+<meta name="description" content="Pattukoleva? Try chey.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐒</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffd93b;--ink:#1c1300;--red:#e63946;--white:#fffdf2;--head:"Bangers",Impact,sans-serif;--body:"Baloo 2",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#2a1f00;--ink:#fff3c4;--red:#ff6b76;--white:#3a2c00}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:500 1.1rem/1.4 var(--body);overflow:hidden;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+:focus-visible{outline:4px solid var(--red);outline-offset:3px}
+h1{font:400 clamp(2.2rem,8vw,3.6rem)/1 var(--head);letter-spacing:.02em;margin:0}
+h1 em{font-style:normal;color:var(--red)}
+p{margin:0}
+
+/* Chase game */
+#game{position:fixed;inset:0}
+#top{position:fixed;top:.8rem;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:0 1rem;pointer-events:none;z-index:2}
+#title{pointer-events:auto;cursor:default}
+#taunt{background:var(--white);border:4px solid var(--ink);border-radius:1rem;padding:.4rem 1rem;font-weight:700;max-width:30rem;min-height:2.9rem;display:flex;align-items:center;justify-content:center}
+#tries{font-size:.95rem;opacity:.85}
+#monkey{position:absolute;width:5.5rem;height:5.5rem;left:calc(50% - 2.75rem);top:45%;border-radius:50%;background:var(--white);border:4px solid var(--ink);font-size:3.4rem;line-height:1;display:grid;place-items:center;padding:0;cursor:pointer;overflow:hidden;touch-action:none;transition:left .18s ease-out,top .18s ease-out;z-index:1}
+#monkey.zz{opacity:.7}
+#monkey.zz::after{content:"💤";position:absolute;top:2px;right:8px;font-size:1.5rem}
+#monkey img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#admit{position:fixed;left:50%;bottom:calc(1.2rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,200%);transition:transform .4s;z-index:3;white-space:nowrap}
+#admit.on{transform:translate(-50%,0)}
+.pill,.btn{font:700 1.05rem var(--body);padding:.6rem 1.3rem;border:4px solid var(--ink);border-radius:999px;background:var(--white);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block;box-shadow:4px 4px 0 var(--ink)}
+.pill:active,.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+#admit.on:active{transform:translate(-50%,0) scale(.97)}
+.go{background:var(--red);color:#fff}
+
+/* Reveal */
+#win{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;padding:1.25rem;background:var(--bg);z-index:5}
+#win.on{display:flex}
+.cert{background:var(--white);border:5px dashed var(--ink);border-radius:1rem;padding:1rem 1.25rem;max-width:22rem}
+.cert b{font:400 1.6rem var(--head);color:var(--red);display:block}
+.fall{position:fixed;top:-2rem;font-size:2rem;pointer-events:none;animation:fall 3s linear forwards;z-index:9}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#monkey{transition:none}}
+</style>
+</head>
+<body>
+
+<div id="game">
+  <div id="top">
+    <h1 id="title">Pattuko <em>ra!</em></h1>
+    <div id="taunt" aria-live="polite">Nuvvu nijamga manishey ayithe, nannu pattuko 😜</div>
+    <div id="tries">Try chesina count: 0</div>
+  </div>
+
+  <button id="monkey" type="button" aria-label="Catch the monkey">
+    <span id="face">🐒</span>
+    <!-- Funny monkey photo or logo: save it as monkey.jpg in the same folder. If missing, the emoji stays. -->
+    <img src="monkey.jpg" alt="" onerror="this.remove()">
+  </button>
+
+  <button id="admit" class="pill go" type="button">Nenu waste, loser ani oppukunta 🙋</button>
+</div>
+
+<!-- After admitting -->
+<section id="win">
+  <h1>Hahaha, <em>oppukunnav!</em> 😂</h1>
+  <div class="cert"><b>OFFICIAL CERTIFICATE</b>Ee vyakti "nenu waste" ani swayanga oppukunnaru ✅<br>Ikkada nundi story chudataniki arhulu 🏅</div>
+  <a class="btn go" href="story.html">Naa life story chudu 📖</a>
+  <p style="font-size:.95rem;opacity:.8">Psst… story open ayaka em jarugutundo chudu 🤫</p>
+</section>
+
+<!-- Shown only when the owner catches the monkey with the secret: opens the REAL story -->
+<section id="caught" style="position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:.9rem;padding:1.25rem;background:var(--bg);z-index:6">
+  <h1>Pattukunna! <em>😎🏆</em></h1>
+  <p>Ippudu nijamaina naa story open avuthundi…</p>
+  <a class="btn go" href="my-story.html">Nijamaina story chudu 📖</a>
+</section>
+
+<script>
+const $ = id => document.getElementById(id);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const taunts = [
+  'Pattuko ra pattuko! 😜',
+  'Pattukoleva? Chi 😂',
+  'Nuvvu nijamga manishey ayithe pattuko!',
+  'Waste nuvvu inka 🙄',
+  'Arey, ur loser ani oppukunava?',
+  'Ayyo, speed saripoledu neeku 😭',
+  'Nee reflexes monkey kante worse 😂',
+  'Inka try chey, nenu fast 🏃🐒',
+  'Chi chi, ila ayithe ela? 🤦',
+  'Waste fellow! Oppuko, story chupistha 😏',
+  'Loser ani oppukunte nee ishtam, kani pattukoleru 🤭'
+];
+
+const m = $('monkey'); let tries = 0, last = 0, size = 88;
+function jump(e){
+  if (e) e.preventDefault();
+  const now = Date.now(); if (now - last < 250) return; last = now;
+  tries++;
+  const topPad = 160, botPad = 100;
+  const x = 8 + Math.random() * Math.max(10, innerWidth - size - 16);
+  const y = topPad + Math.random() * Math.max(10, innerHeight - size - topPad - botPad);
+  m.style.left = x + 'px'; m.style.top = y + 'px';
+  $('taunt').textContent = tries === 1 ? 'Hehe, miss ayyindi! 🙈' : pick(taunts);
+  $('tries').textContent = 'Try chesina count: ' + tries;
+  if (tries >= 5) $('admit').classList.add('on');
+}
+/* ---- SECRET: tap the "Pattuko ra!" title 5 times within 3 seconds.
+   The monkey falls asleep (dim + 💤, phone vibrates) for 10 seconds. Tap it to catch it. ---- */
+let sleepy = false, caught = false, secretTaps = 0, secretTimer, wakeTimer;
+$('title').addEventListener('click', () => {
+  secretTaps++; clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => secretTaps = 0, 3000);
+  if (secretTaps >= 5 && !sleepy && !caught) {
+    secretTaps = 0; sleepy = true; m.classList.add('zz');
+    if (navigator.vibrate) navigator.vibrate(60);
+    wakeTimer = setTimeout(() => { sleepy = false; m.classList.remove('zz'); }, 10000);
+  }
+});
+function catchIt(e){
+  if (e) e.preventDefault();
+  if (caught) return; caught = true; clearTimeout(wakeTimer);
+  $('caught').style.display = 'flex';
+  burst();
+  setTimeout(() => { location.href = 'my-story.html'; }, 2200);
+}
+m.addEventListener('pointerenter', e => { if (!sleepy) jump(e); });
+m.addEventListener('pointerdown', e => sleepy ? catchIt(e) : jump(e));
+m.addEventListener('click', e => sleepy ? catchIt(e) : jump(e));
+
+function burst(){
+  if (calm) return;
+  for (let i = 0; i < 28; i++) {
+    const b = document.createElement('div');
+    b.className = 'fall'; b.textContent = pick(['🍌','🐒','🎉','🏆']);
+    b.style.left = Math.random() * 95 + 'vw'; b.style.animationDelay = Math.random() * 1.2 + 's';
+    document.body.appendChild(b); setTimeout(() => b.remove(), 4500);
+  }
+}
+
+$('admit').addEventListener('click', () => { $('win').classList.add('on'); burst(); });
+</script>
+</body>
+</html>
